@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <title>Fake News Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .toggle-dot { transition: transform 0.3s ease-in-out; }
+        input:checked ~ .toggle-dot { transform: translateX(100%); }
+    </style>
+</head>
+<body class="bg-black text-white flex flex-col min-h-screen">
+
+<!-- Navbar -->
+<nav class="flex justify-between items-center px-6 py-4 bg-gray-900 text-white shadow-md">
+    <div class="text-xl font-bold">Fake News Detection</div>
+    <ul class="flex gap-6 items-center">
+        <li><a href="{% url 'get_email' %}" class="hover:underline">Home</a></li>
+        <li><a href="#" class="hover:underline">Reports</a></li>
+        <li><a href="#" class="hover:underline">Contact</a></li>
+        <li>
+            <label class="flex items-center cursor-pointer">
+                <span class="mr-2 text-sm">Dark Mode</span>
+                <input type="checkbox" id="themeToggle" class="hidden" />
+                <div class="relative w-10 h-5 bg-gray-400 rounded-full">
+                    <div class="toggle-dot absolute top-0 left-0 w-5 h-5 bg-white rounded-full"></div>
+                </div>
+            </label>
+        </li>
+    </ul>
+</nav>
+
+<!-- Main Container -->
+<main class="flex-grow flex flex-col items-center justify-center px-4 py-10 relative">
+
+    <!-- Error Alert -->
+    {% if error %}
+    <div class="fixed top-10 left-1/2 transform -translate-x-1/2 bg-red-700 text-white text-lg font-bold px-6 py-4 rounded-xl shadow-lg z-50 border border-red-300 max-w-xl w-full text-center">
+        {{ error }}
+    </div>
+    <script>
+        setTimeout(() => {
+            const errorBox = document.querySelector('[class*="bg-red-700"]');
+            if (errorBox) errorBox.style.display = 'none';
+        }, 5000);
+    </script>
+    {% endif %}
+
+    <!-- Result Popup -->
+    {% if result %}
+    <div id="popup" class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50 px-4">
+        <div class="bg-gray-800 text-white border-2 border-blue-600 px-6 py-6 rounded-xl shadow-xl text-center max-w-md w-full">
+            <h3 class="text-xl font-semibold mb-2">Analysis Result</h3>
+            <p class="text-lg">
+                This news is 
+                {% if result == "FAKE" %}
+                    <span class="text-red-500 font-bold">{{ result }}</span> ❌
+                {% else %}
+                    <span class="text-green-400 font-bold">{{ result }}</span> ✅
+                {% endif %}
+            </p>
+            <p class="text-sm mt-1">Based on our analysis this result is reliable</p>
+            {% if result == "FAKE" %}
+                <p class="mt-2 font-semibold text-red-400">
+                    ⚠️ Warning! This article may contain false or misleading information. Potential misinformation detected — proceed with caution.
+                </p>
+            {% else %}
+                <p class="mt-2 font-semibold text-green-400">
+                    ✅ This article appears to be trustworthy and legitimate. No indicators of misinformation found in this news piece.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sounds -->
+    <audio id="realSound" src="{% static 'sounds/clang_and_wobble.ogg' %}" preload="auto"></audio>
+    <audio id="fakeSound" src="{% static 'sounds/beep_short.ogg' %}" preload="auto"></
